@@ -12,25 +12,36 @@ public class Lox {
     static boolean hadError = false;
 
     public static void main(String[] args) {
+        // Multiple arguments - bad usage
         if (args.length > 1) {
             System.out.println("Usage: jlox [script]");
             System.exit(64);
         }
+        // Single argument - run a specified file
         else if (args.length == 1) {
-            runFile(args[0]);
+            try {
+                runFile(args[0]);
+            } 
+            catch (Exception e) { }
         }
+        // No argument - run the prompt
         else {
-            runPrompt();
+            try {
+                runPrompt();
+            }
+            catch (Exception e) {}
         }
     }
 
+    // Run a specified file
     private static void runFile(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
-        run(new String(bytes, Charset.defaultCharset()));
+        run(new String(bytes, Charset.defaultCharset())); // it reads the whole file and shows all errors before quitting
 
         if (hadError) System.exit(65);
     }
 
+    // Run the prompt
     private static void runPrompt() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);

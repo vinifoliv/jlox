@@ -8,6 +8,7 @@ import java.util.List;
 // Automatically generates an AST (Expr.java)
 public class GenerateAst {
     public static void main(String[] args) throws IOException {
+        // output directory lacking
         if (args.length != 1) {
             System.err.println("Usage: generate_ast <output directory>");
             System.exit(64);
@@ -23,7 +24,7 @@ public class GenerateAst {
 
     private static void defineAst(
         String outputDir, String baseName, List<String> types) throws IOException {
-        String path = outputDir + "/" + baseName + ".java";
+        String path = outputDir + "/" + baseName + ".java"; // path = com/craftinginterpreters/lox/Expr.java
         PrintWriter writer = new PrintWriter(path, "UTF-8");
 
         writer.println("package com.craftinginterpreters.lox;");
@@ -31,6 +32,9 @@ public class GenerateAst {
         writer.println("import java.util.List;");
         writer.println();
         writer.println("abstract class " + baseName + " {");
+        writer.println();
+
+        defineVisitor(writer, baseName, types);
 
         // Subclasses definition
         for (String type : types) {
@@ -39,8 +43,25 @@ public class GenerateAst {
             defineType(writer, baseName, className, fields);
         }
 
+        // accept()
+        writer.println();
+        writer.println("\tabstract <R> R accept(Visitor<R> visitor);");
+
+        // End of Expr class
         writer.println("}");
         writer.close();
+    }
+
+    private static void defineVisitor(PrintWriter writer, String baseName, List<String> types) {
+        writer.println("\tinterface Visitor<R> {");
+
+        for (String type : types) {
+            String typeName = type.split(":")[0].trim();
+            writer.println("\t\tR visit" + typeName + baseName + "(" + typeName + " " + baseName.toLowerCase() + ");");
+        }
+
+        writer.println("\t}");
+        writer.println();
     }
 
     private static void defineType(PrintWriter writer, String baseName, String className, String fieldList) {
@@ -56,7 +77,17 @@ public class GenerateAst {
             writer.println("\t\t\tthis." + name + " = " + name + ";");
         }
 
-        writer.println("\t\t}\n");
+        writer.println("\t\t}");
+
+        // Visitor pattern
+        writer.println();
+        writer.println("\t\t@Override");
+        writer.println("\t\t<R> R accept(Visitor<R> visitor) {");
+        writer.println("\t\t\treturn visitor.visit" + className + baseName + "(this);");
+        writer.println("\t\t}");
+        writer.println();
+
+        // Fields
         for (String field : fields) {
             writer.println("\t\tfinal " + field + ";");
         }
