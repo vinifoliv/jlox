@@ -1,8 +1,10 @@
 ROOT_DIR = ../../..
 PACKAGE = com/craftinginterpreters/lox
-CLASSES = TokenType.java \
-		  Token.java     \
-		  Scanner.java   \
+CLASSES = TokenType.java  \
+		  Token.java      \
+		  Scanner.java    \
+		  Expr.java       \
+		  AstPrinter.java \
 		  Lox.java
 
 default: compile
