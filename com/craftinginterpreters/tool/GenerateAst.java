@@ -13,6 +13,7 @@ public class GenerateAst {
             System.err.println("Usage: generate_ast <output directory>");
             System.exit(64);
         }
+
         String outputDir = args[0];
         defineAst(outputDir, "Expr", Arrays.asList(
             "Binary : Expr left, Token operator, Expr right",
@@ -27,13 +28,19 @@ public class GenerateAst {
         String path = outputDir + "/" + baseName + ".java"; // path = com/craftinginterpreters/lox/Expr.java
         PrintWriter writer = new PrintWriter(path, "UTF-8");
 
+        // Package
         writer.println("package com.craftinginterpreters.lox;");
         writer.println();
+
+        // Imports
         writer.println("import java.util.List;");
         writer.println();
+
+        // Class definition
         writer.println("abstract class " + baseName + " {");
         writer.println();
 
+        // Visitor definition
         defineVisitor(writer, baseName, types);
 
         // Subclasses definition
@@ -57,6 +64,7 @@ public class GenerateAst {
 
         for (String type : types) {
             String typeName = type.split(":")[0].trim();
+            
             writer.println("\t\tR visit" + typeName + baseName + "(" + typeName + " " + baseName.toLowerCase() + ");");
         }
 
