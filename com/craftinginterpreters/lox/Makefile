@@ -5,12 +5,13 @@ CLASSES = TokenType.java  \
 		  Scanner.java    \
 		  Expr.java       \
 		  AstPrinter.java \
+		  Parser.java     \
 		  Lox.java
 
 default: compile
 
 compile: $(CLASSES)
-	@javac $(CLASSES)
+	@javac $(CLASSES) ../build
 	@echo Compilation finished.
 
 clean:
