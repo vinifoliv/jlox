@@ -39,3 +39,27 @@ var fiesta = Car("GLi 2024", 2023, "Black"); // No keyword new is used
 print fiesta.color; // => Black
 fiesta.drive();
 ```
+
+# Running
+You will need JDK to run this project. After installing and setting it up, clone this repo:
+
+```shell
+$ git clone git@github.com:vinifoliv/jlox.git
+```
+
+After it, go to the lox directory:
+```shell
+$ cd ./com/craftinginterpreters/lox
+```
+
+If you are on Linux and have make installed, just run `make`. Otherwise, compile it manually (the .java files order are explicit in the Makefile):
+
+```shell
+$ javac file1.java file2.java # Example
+```
+
+Running the project is as simple as getting back to the root directory and typing:
+
+```shell
+$ java com.craftinginterpreters.lox.Lox
+```
