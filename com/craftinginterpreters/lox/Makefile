@@ -4,6 +4,7 @@ CLASSES = TokenType.java    \
 		  Token.java        \
 		  Scanner.java      \
 		  Expr.java         \
+		  Stmt.java         \
 		  AstPrinter.java   \
 		  Parser.java       \
 		  RuntimeError.java \
