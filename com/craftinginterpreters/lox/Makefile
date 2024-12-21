@@ -2,10 +2,10 @@ ROOT_DIR = ../../..
 PACKAGE = com/craftinginterpreters/lox
 CLASSES = TokenType.java    \
 		  Token.java        \
+		  Environment.java  \
 		  Scanner.java      \
 		  Expr.java         \
 		  Stmt.java         \
-		  AstPrinter.java   \
 		  Parser.java       \
 		  RuntimeError.java \
 		  Interpreter.java  \
@@ -14,8 +14,7 @@ CLASSES = TokenType.java    \
 default: compile
 
 compile: $(CLASSES)
-	@javac $(CLASSES)
-	@echo Compilation finished.
+	javac $(CLASSES)
 
 clean:
 	@rm -rf *.class

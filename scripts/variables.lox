@@ -4,3 +4,11 @@ var b = 2;
 print a;
 print b;
 print a + b;
+
+print "\n";
+
+a = 2;
+
+print a;
+print b = 3;
+print a + b;
