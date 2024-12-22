@@ -1,9 +1,33 @@
-default: ast
+ROOT_DIR=../../..
+LOX_DIR  = com/craftinginterpreters/lox
+TOOL_DIR = com/craftinginterpreters/tool
+
+LOX_PACKAGE  = com.craftinginterpreters.lox
+TOOL_PACKAGE = com.craftinginterpreters.tool
+
+CLASSES = TokenType.java    \
+		  Token.java        \
+		  Environment.java  \
+		  Scanner.java      \
+		  Expr.java         \
+		  Stmt.java         \
+		  Parser.java       \
+		  RuntimeError.java \
+		  Interpreter.java  \
+		  Lox.java
+
+default: lox
+
+lox:
+	@cd $(LOX_DIR) && javac $(CLASSES)
+
+repl:
+	@java $(LOX_PACKAGE).Lox 
 
 ast:
-	@cd com/craftinginterpreters/tool && javac GenerateAst.java
-	@cd ../../..
-	@java com.craftinginterpreters.tool.GenerateAst com/craftinginterpreters/lox
+	@cd $(TOOL_DIR) && javac GenerateAst.java
+	@cd $(ROOT_DIR)
+	@java $(TOOL_PACKAGE).GenerateAst $(LOX_DIR)
 
 clean:
-	@sudo find . -name "*.class" -type f -delete
+	@find . -name "*.class" -type f -delete
