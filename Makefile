@@ -14,6 +14,7 @@ CLASSES = TokenType.java    \
 		  Parser.java       \
 		  RuntimeError.java \
 		  Interpreter.java  \
+		  LoxCallable.java  \
 		  Lox.java
 
 default: lox
