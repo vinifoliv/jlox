@@ -26,13 +26,15 @@ public class GenerateAst {
             "Variable : Token name"
         ));
         defineAst(outputDir, "Stmt", Arrays.asList(
+            "Function   : Token name, List<Token> params," +
+                        " List<Stmt> body",
             "If         : Expr condition, Stmt thenBranch," +
                         " Stmt elseBranch",
             "Block      : List<Stmt> statements",
             "Expression : Expr expression",
             "Print      : Expr expression",
             "Var        : Token name, Expr initializer",
-            "While  : Expr condition, Stmt body"
+            "While      : Expr condition, Stmt body"
         ));
     }
 
