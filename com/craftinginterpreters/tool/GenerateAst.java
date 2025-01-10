@@ -33,6 +33,7 @@ public class GenerateAst {
             "Block      : List<Stmt> statements",
             "Expression : Expr expression",
             "Print      : Expr expression",
+            "Return     : Token keyword, Expr value", // Keywork is kept for error reporting
             "Var        : Token name, Expr initializer",
             "While      : Expr condition, Stmt body"
         ));

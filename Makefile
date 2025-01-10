@@ -8,6 +8,7 @@ TOOL_PACKAGE = com.craftinginterpreters.tool
 CLASSES = TokenType.java    \
 		  Token.java        \
 		  Environment.java  \
+		  Return.java       \
 		  Scanner.java      \
 		  Expr.java         \
 		  Stmt.java         \
