@@ -311,6 +311,19 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     }
 
     /**
+     * Visits a get expression, resolving the object to be gotten within
+     * the current scope.
+     *
+     * @param expr The get expression to visit.
+     * @return Always returns null.
+     */
+    @Override
+    public Void visitGetExpr(Expr.Get expr) {
+        resolve(expr.object);
+        return null;
+    }
+
+    /**
      * Visits a grouping expression, resolving the expression inside of
      * parentheses within the current scope.
      *
@@ -346,6 +359,22 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     public Void visitLogicalExpr(Expr.Logical expr) {
         resolve(expr.left);
         resolve(expr.right);
+        return null;
+    }
+
+    /**
+     * Visits a set expression, resolving the value to be assigned
+     * on the right side of the assignment and the object to be
+     * assigned on the left side of the assignment within the current
+     * scope.
+     *
+     * @param expr The set expression to visit.
+     * @return Always returns null.
+     */
+    @Override
+    public Void visitSetExpr(Expr.Set expr) {
+        resolve(expr.value);
+        resolve(expr.object);
         return null;
     }
 

@@ -26,7 +26,12 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     /**
-     * Kicks off the interpreting process.
+     * Interprets a list of statements by executing each statement
+     * sequentially. If a runtime error occurs during the execution
+     * of any statement, it catches the error and reports it using
+     * the Lox runtime error mechanism.
+     *
+     * @param statements The list of statements to be interpreted.
      */
     void interpret(List<Stmt> statements) {
         try {
@@ -39,14 +44,28 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
     }
 
+    
     /**
-     * Returns the value of a literal.
+     * Evaluates a literal expression and returns its value.
+     *
+     * @param expr The literal expression to evaluate.
+     * @return The value of the literal expression.
      */
     @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
         return expr.value;
     }
 
+    /**
+     * Evaluates a logical expression by first evaluating the left operand.
+     * If the operator is "or" and the left operand is truthy, returns the
+     * left operand. Otherwise, if the operator is "and" and the left operand
+     * is falsy, returns the left operand. If neither condition is met, it
+     * evaluates and returns the right operand.
+     *
+     * @param expr The logical expression to evaluate.
+     * @return The result of the logical expression evaluation.
+     */
     @Override
     public Object visitLogicalExpr(Expr.Logical expr) {
         Object left = evaluate(expr.left);
@@ -58,6 +77,29 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         return evaluate(expr.right);
+    }
+
+    /**
+     * Evaluates a set expression by first resolving the object to be
+     * assigned in the current scope. If the object is not an instance,
+     * it throws a runtime error, as only instances have fields. Then,
+     * it evaluates the value to be assigned to the object and assigns
+     * it to the object, returning the value.
+     *
+     * @param expr The set expression to evaluate.
+     * @return The value of the assignment.
+     */
+    @Override
+    public Object visitSetExpr(Expr.Set expr) {
+        Object object = evaluate(expr.object);
+
+        if (!(object instanceof LoxInstance)) {
+            throw new RuntimeError(expr.name, "Only instances have fields.");
+        }
+
+        Object value = evaluate(expr.value);
+        ((LoxInstance)object).set(expr.name, value);
+        return value;
     }
 
     /**
@@ -361,6 +403,15 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    /**
+     * Evaluates a call expression, resolving the callee to be called
+     * within the current scope, resolving all of the arguments to the
+     * call within the current scope, and then calling the resolved
+     * callable with the resolved arguments.
+     *
+     * @param expr The call expression to visit.
+     * @return The result of calling the resolved function.
+     */
     @Override
     public Object visitCallExpr(Expr.Call expr) {
         Object callee = evaluate(expr.callee);
@@ -383,5 +434,23 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
 
         return function.call(this, arguments);
+    }
+
+    /**
+     * Evaluates a get expression, resolving the object to be gotten
+     * within the current scope, and then getting the field from the
+     * resolved object.
+     *
+     * @param expr The get expression to visit.
+     * @return The value of the field.
+     */
+    @Override
+    public Object visitGetExpr(Expr.Get expr) {
+        Object object = evaluate(expr.object);
+        if (object instanceof LoxInstance) {
+            return ((LoxInstance) object).get(expr.name);
+        }
+
+        throw new RuntimeError(expr.name, "Only instances have properties.");
     }
 }

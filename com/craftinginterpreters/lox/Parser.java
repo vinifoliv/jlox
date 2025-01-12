@@ -217,7 +217,21 @@ class Parser {
         return statements;
     }
 
-    // assignment  -> IDENTIFIER "=" assignment | logic_or ;
+    /**
+     * Parses an assignment expression. It attempts to parse an
+     * expression as a variable or property access, and if it
+     * encounters an equal sign, it parses the right-hand side
+     * recursively as another assignment expression. If the left-hand
+     * side of the assignment is a valid target (either a variable or
+     * a property), it constructs an appropriate assignment or set
+     * expression. Otherwise, it reports an error for an invalid
+     * assignment target.
+     *
+     *  assignment  -> IDENTIFIER "=" assignment | logic_or ;
+     * 
+     * @return The parsed expression, which could be an assignment,
+     *         set, or a simpler expression if no assignment is present.
+     */
     private Expr assignment() {
         Expr expr = or();
 
@@ -228,7 +242,10 @@ class Parser {
             if (expr instanceof Expr.Variable) {
                 Token name = ((Expr.Variable)expr).name;
                 return new Expr.Assign(name, value);
-            }
+            } else if (expr instanceof Expr.Get) {
+                Expr.Get get = (Expr.Get)expr;
+                return new Expr.Set(get.object, get.name, value);
+            } 
             
             error(equals, "Invalid assignment target.");
         }
@@ -330,6 +347,17 @@ class Parser {
         return call();
     }
     
+    /**
+     * Parses a call expression with arguments. This method collects a
+     * list of argument expressions separated by commas, ensuring that
+     * the number of arguments does not exceed 255. It consumes the
+     * closing parenthesis after the arguments and constructs a new
+     * Expr.Call object representing the function or method call.
+     *
+     * @param callee The expression representing the entity being called.
+     * @return An Expr.Call object encapsulating the callee, the
+     *         closing parenthesis, and the list of arguments.
+     */
     private Expr finishCall(Expr callee) {
         List<Expr> arguments = new ArrayList<>();
         if (!check(RIGHT_PAREN)) {
@@ -345,12 +373,23 @@ class Parser {
         return new Expr.Call(callee, paren, arguments);
     }
 
+    /**
+     * Parses a call expression or an expression with a trailing dot
+     * for property access. The method is structured as a loop that
+     * continues to parse call expressions and property access until
+     * an expression is found that is not a call or property access.
+     *
+     * @return the parsed expression
+     */
     private Expr call() {
         Expr expr = primary();
 
         while(true) {
             if (match(LEFT_PAREN)) {
                 expr = finishCall(expr);
+            } else if (match(DOT)) {
+                Token name = consume(IDENTIFIER, "Expect property name after '.'.");
+                expr = new Expr.Get(expr, name);
             } else {
                 break;
             }
