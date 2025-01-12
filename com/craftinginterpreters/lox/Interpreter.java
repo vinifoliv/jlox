@@ -1,11 +1,14 @@
 package com.craftinginterpreters.lox;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     final Environment globals = new Environment();
     private Environment environment = globals;
+    private final Map<Expr, Integer> locals = new HashMap<>();
 
     Interpreter() {
         globals.define("clock", new LoxCallable() {
@@ -76,9 +79,32 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    /**
+     * Visits a variable expression, retrieving the value of the variable
+     * by looking up its name in the current environment or global scope.
+     *
+     * @param expr The variable expression to visit.
+     * @return The value of the variable.
+     */
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {
-        return environment.get(expr.name);
+        return lookUpVariable(expr.name, expr);
+    }
+
+    /**
+     * Looks up the value of a variable by traversing the scope chain.
+     *
+     * @param name The token for the variable name.
+     * @param expr The expression where the variable is used.
+     * @return The value of the variable.
+     */
+    private Object lookUpVariable(Token name, Expr expr) {
+        Integer distance = locals.get(expr);
+        if (distance != null) {
+            return environment.getAt(distance, name.lexeme);
+        } else {
+            return globals.get(name);
+        }
     }
 
     /**
@@ -148,8 +174,22 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return expr.accept(this);
     }
 
+    /**
+     * Executes a statement. This is the entry-point for the entire interpreter.
+     */
     private void execute(Stmt stmt) {
         stmt.accept(this);
+    }
+
+    /**
+     * Associates an expression with a depth, which is how many scopes to
+     * traverse to resolve the expression.
+     *
+     * @param expr The expression to associate with a depth.
+     * @param depth The depth of the expression.
+     */
+    void resolve(Expr expr, int depth) {
+        locals.put(expr, depth);
     }
 
     void executeBlock(List<Stmt> statements, Environment environment) {
@@ -231,10 +271,24 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         return null;
     }
 
+    /**
+     * Evaluates an assignment expression, computes the value to be assigned,
+     * and updates the value of the variable in the appropriate scope.
+     *
+     * @param expr The assignment expression to visit.
+     * @return The value that was assigned.
+     */
     @Override
     public Object visitAssignExpr(Expr.Assign expr) {
         Object value = evaluate(expr.value);
-        environment.assign(expr.name, value);
+
+        Integer distance = locals.get(expr);
+        if (distance != null) {
+            environment.assignAt(distance, expr.name, value);
+        } else {
+            globals.assign(expr.name, value);
+        }
+
         return value;
     }
 

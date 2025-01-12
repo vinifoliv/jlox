@@ -42,4 +42,44 @@ class Environment {
     void define(String name, Object value) {
         values.put(name, value);
     }
+
+    /**
+     * Gets the ancestor environment {@code distance} steps away from this environment.
+     * If the distance is 0, the environment itself is returned.
+     *
+     * @param distance the number of ancestors to traverse
+     * @return the specified ancestor environment
+     */
+    Environment ancestor(int distance) {
+        Environment environment = this;
+        for (int i = 0; i < distance; i++) {
+            environment = environment.enclosing;
+        }
+
+        return environment;
+    }
+
+    /**
+     * Gets the value of the variable with the given name
+     * in the scope which is {@code distance} ancestors away.
+     *
+     * @param distance the number of scopes to traverse
+     * @param name the name of the variable
+     * @return the value of the variable
+     */
+    Object getAt(int distance, String name) {
+        return ancestor(distance).values.get(name);
+    }
+
+    /**
+     * Assigns the value to the variable with the given name in the scope which
+     * is {@code distance} ancestors away.
+     *
+     * @param distance the number of scopes to traverse
+     * @param name the name of the variable
+     * @param value the value to assign
+     */
+    void assignAt(int distance, Token name, Object value) {
+        ancestor(distance).values.put(name.lexeme, value);
+    }
 }

@@ -58,6 +58,17 @@ public class Lox {
         }
     }
 
+    /**
+     * Executes the given source code.
+     *
+     * This method scans the source code to generate tokens,
+     * parses the tokens into statements, and then interprets
+     * the statements. If any errors occur during scanning or
+     * parsing, the method exits early without executing the
+     * statements.
+     *
+     * @param source The source code to be executed.
+     */
     private static void run(String source) {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
@@ -65,6 +76,11 @@ public class Lox {
         List<Stmt> statements = parser.parse();
 
         // Stop if errors occured
+        if (hadError) return;
+
+        Resolver resolver = new Resolver(interpreter);
+        resolver.resolve(statements);
+
         if (hadError) return;
 
         interpreter.interpret(statements);
