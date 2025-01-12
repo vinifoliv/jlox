@@ -34,7 +34,8 @@ public class GenerateAst {
             "If         : Expr condition, Stmt thenBranch," +
                         " Stmt elseBranch",
             "Block      : List<Stmt> statements",
-            "Class      : Token name, List<Stmt.Function> methods",
+            "Class      : Token name, Expr.Variable superclass," + 
+                        " List<Stmt.Function> methods",
             "Expression : Expr expression",
             "Print      : Expr expression",
             "Return     : Token keyword, Expr value", // Keywork is kept for error reporting
