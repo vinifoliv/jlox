@@ -20,6 +20,13 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         METHOD
     }
 
+    private enum ClassType {
+        NONE,
+        CLASS
+    }
+
+    private ClassType currentClass = ClassType.NONE;
+
     /**
      * Resolves a list of statements, which means visiting each statement
      * and allowing it to resolve any expressions or other statements it
@@ -140,22 +147,33 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     }
 
     /**
-     * Visits a class statement, declaring the class name in the current
-     * scope, defining it, and then resolving each of its methods.
+     * Visits a class statement by declaring and defining the class name
+     * within the current scope, creating a new scope for the class body,
+     * and resolving each of the class's methods as methods within this
+     * new scope.
      *
      * @param stmt The class statement to visit.
      * @return Always returns null.
      */
     @Override
     public Void visitClassStmt(Stmt.Class stmt) {
+        ClassType enclosingClass = currentClass;
+        currentClass = ClassType.CLASS;
+
         declare(stmt.name);
         define(stmt.name);
+
+        beginScope();
+        scopes.peek().put("this", true);
 
         for (Stmt.Function method : stmt.methods) {
             FunctionType declaration = FunctionType.METHOD;
             resolveFunction(method, declaration);
         }
 
+        endScope();
+
+        currentClass = enclosingClass;
         return null;
     }
 
@@ -382,6 +400,25 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     public Void visitSetExpr(Expr.Set expr) {
         resolve(expr.value);
         resolve(expr.object);
+        return null;
+    }
+
+
+    /**
+     * Visits a this expression, which is only valid within a class (and
+     * not within a class initializer). If the expression is valid, resolves
+     * the this keyword within the current scope.
+     *
+     * @param expr The this expression to visit.
+     * @return Always returns null.
+     */
+    @Override
+    public Void visitThisExpr(Expr.This expr) {
+        if (currentClass == ClassType.NONE) {
+            Lox.error(expr.keyword, "Can't use 'this' outside of a class.");
+        }
+
+        resolveLocal(expr, expr.keyword);
         return null;
     }
 

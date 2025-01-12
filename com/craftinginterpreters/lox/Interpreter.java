@@ -103,6 +103,19 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     /**
+     * Evaluates a this expression by looking up the this keyword
+     * in the current scope, returning the value associated with
+     * the this keyword.
+     *
+     * @param expr The this expression to evaluate.
+     * @return The value associated with the this keyword.
+     */
+    @Override
+    public Object visitThisExpr(Expr.This expr) {
+        return lookUpVariable(expr.keyword, expr);
+    }
+
+    /**
      * Evaluates the right-side of a unary expression and returns either its either numerically (-) or logically (!) opposite value.
      */
     @Override

@@ -397,7 +397,17 @@ class Parser {
         return expr;
     }
 
-    // primary → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+    
+    /**
+     * Parses a primary expression. A primary expression is the most basic
+     * kind of expression and includes literals, grouping, and identifiers.
+     * This method is structured as a big if-else chain that checks for
+     * each type of primary expression and parses it accordingly.
+     *
+     * primary → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+     * 
+     * @return A parsed Expr object.
+     */
     private Expr primary() {
         if (match(FALSE)) return new Expr.Literal(false);
         if (match(TRUE)) return new Expr.Literal(true);
@@ -405,6 +415,8 @@ class Parser {
 
         if (match(NUMBER, STRING)) return new Expr.Literal(previous().literal);
         
+        if (match(THIS)) return new Expr.This(previous());
+
         if (match(IDENTIFIER)) {
             return new Expr.Variable(previous());
         }
