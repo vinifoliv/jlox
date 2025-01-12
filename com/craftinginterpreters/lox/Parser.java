@@ -421,6 +421,13 @@ class Parser {
 
         if (match(NUMBER, STRING)) return new Expr.Literal(previous().literal);
         
+        if (match(SUPER)) {
+            Token keyword = previous();
+            consume(DOT, "Expect '.' after 'super'.");
+            Token method = consume(IDENTIFIER, "Expect superclass method name.");
+            return new Expr.Super(keyword, method);
+        }
+
         if (match(THIS)) return new Expr.This(previous());
 
         if (match(IDENTIFIER)) {
@@ -499,8 +506,13 @@ class Parser {
         return new ParseError();
     }
 
+
     /**
-     * Synchronizes the parser with the forthcoming token that matches the grammar
+     * Synchronizes the parser by advancing through tokens until it is likely
+     * at the beginning of a new statement. This method is used to recover
+     * from a parsing error by skipping tokens until after a statement terminator
+     * (semicolon) or until it finds a token that can start a new statement,
+     * such as 'class', 'fun', 'var', 'for', 'if', 'while', 'print', or 'return'.
      */
     private void synchronize() {
         advance();
