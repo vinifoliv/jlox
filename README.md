@@ -40,26 +40,52 @@ print fiesta.color; // => Black
 fiesta.drive();
 ```
 
-# Running
-You will need JDK to run this project. After installing and setting it up, clone this repo:
+# Running the project
+__Requirements__
+- JDK;
+- `make`
+
+This project was built on a WSL Ubuntu environment, but you should be able to run it on Windows, provided that you compile all of the project classes by hand or install `make` on Windows. If you prefer to install `make`, change the `clean` rule in the Makefile to `Get-ChildItem -Recurse -Filter *.class | Remove-Item -Force` so as to run it on PowerShell.
+
+__Steps__
+1. Clone this repo
 
 ```shell
 $ git clone git@github.com:vinifoliv/jlox.git
 ```
 
-After it, go to the lox directory:
+2. Run `make` inside the root directory
 ```shell
-$ cd ./com/craftinginterpreters/lox
+$ make
 ```
 
-If you are on Linux and have make installed, just run `make`. Otherwise, compile it manually (the .java files order are explicit in the Makefile):
+If you do not have `make` installed, compile it manually:
 
 ```shell
-$ javac file1.java file2.java # Example
+$ javac TokenType.java    \
+        Token.java        \
+        Environment.java  \
+        Return.java       \
+        Scanner.java      \
+        Expr.java         \
+        Stmt.java         \
+        Parser.java       \
+        RuntimeError.java \
+        LoxCallable.java  \
+        LoxFunction.java  \
+        Interpreter.java  \
+        Resolver.java     \
+        Lox.java
 ```
 
-Running the project is as simple as getting back to the root directory and typing:
+3. Run it
 
+__REPL__
 ```shell
 $ java com.craftinginterpreters.lox.Lox
+```
+
+__Script__
+```shell
+$ java com.craftinginterpreters.lox.Lox path/to/script
 ```
