@@ -15,7 +15,9 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     }
 
     private enum FunctionType {
-        NONE, FUNCTION
+        NONE, 
+        FUNCTION, 
+        METHOD
     }
 
     /**
@@ -139,8 +141,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     /**
      * Visits a class statement, declaring the class name in the current
-     * scope and defining it, allowing the class to be referenced within
-     * its methods and elsewhere in the scope.
+     * scope, defining it, and then resolving each of its methods.
      *
      * @param stmt The class statement to visit.
      * @return Always returns null.
@@ -149,6 +150,12 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     public Void visitClassStmt(Stmt.Class stmt) {
         declare(stmt.name);
         define(stmt.name);
+
+        for (Stmt.Function method : stmt.methods) {
+            FunctionType declaration = FunctionType.METHOD;
+            resolveFunction(method, declaration);
+        }
+
         return null;
     }
 

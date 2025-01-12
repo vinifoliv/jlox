@@ -5,9 +5,26 @@ import java.util.Map;
 
 class LoxClass implements LoxCallable {
     final String name;
+    private final Map<String, LoxFunction> methods;
     
-    LoxClass(String name) {
+    LoxClass(String name, Map<String, LoxFunction> methods) {
         this.name = name;
+        this.methods = methods;
+    }
+
+    /**
+     * Finds a method in the class by name and returns the corresponding
+     * LoxFunction if the method exists, or null if it does not.
+     *
+     * @param name The name of the method to find.
+     * @return the LoxFunction matching the given name, or null if the method does not exist.
+     */
+    LoxFunction findMethod(String name) {
+        if (methods.containsKey(name)) {
+            return methods.get(name);
+        }
+
+        return null;
     }
 
     /**

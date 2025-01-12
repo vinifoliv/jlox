@@ -12,16 +12,22 @@ class LoxInstance {
     }
 
     /**
-     * Retrieves the value of a property from the LoxInstance.
-     * 
-     * @param name The token for the property name.
-     * @return The value of the property.
-     * @throws RuntimeError if the property does not exist.
+     * Retrieves the value of a field from the object. If the field is not an instance variable,
+     * it checks if there is a method with the same name and returns that. If there is neither
+     * an instance variable or a method with the given name, it throws a runtime error.
+     *
+
+     * @param name the name of the field to retrieve
+     * @return the value of the field, or the method with the same name
+     * @throws RuntimeError if the field does not exist
      */
     Object get(Token name) {
         if (fields.containsKey(name.lexeme)) {
             return fields.get(name.lexeme);
         }
+
+        LoxFunction method = klass.findMethod(name.lexeme);
+        if (method != null) return method;
 
         throw new RuntimeError(name, "Undefined property '" + name.lexeme + "'.");
     }
