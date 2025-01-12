@@ -39,25 +39,35 @@ class LoxClass implements LoxCallable {
     }
 
     /**
-     * Calls the class to create a new instance of the class.
+     * Calls the class to create a new instance of it. If the class has an initializer
+     * method named "init", it will be called with the provided arguments to initialize
+     * the new instance.
      *
-     * @param interpreter the interpreter to use
-     * @param arguments   the arguments to pass to the class's initializer
-     * @return the newly created instance of the class
+     * @param interpreter the interpreter to use while calling the initializer
+     * @param arguments   the arguments to pass to the initializer
+     * @return the new instance of the class
      */
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {
         LoxInstance instance = new LoxInstance(this);
+        LoxFunction initializer = findMethod("init");
+        if (initializer != null) {
+            initializer.bind(instance).call(interpreter, arguments);
+        }
         return instance;
     }
 
+
     /**
-     * Gets the number of parameters that the class's initializer accepts.
+     * Returns the number of arguments that the initializer method of this class
+     * takes. If the class does not have an initializer method, it returns 0.
      *
-     * @return the number of parameters that the class's initializer accepts
+     * @return the number of arguments that the initializer method takes, or 0 if there is no initializer
      */
     @Override
     public int arity() {
-        return 0;
+        LoxFunction initializer = findMethod("init");
+        if (initializer == null) return 0;
+        return initializer.arity();
     }
 }

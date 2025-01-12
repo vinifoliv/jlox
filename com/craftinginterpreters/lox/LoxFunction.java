@@ -5,8 +5,10 @@ import java.util.List;
 class LoxFunction implements LoxCallable {
     private final Stmt.Function declaration;
     private final Environment closure;
+    private final boolean isInitializer;
 
-    LoxFunction(Stmt.Function declaration, Environment closure) {
+    LoxFunction(Stmt.Function declaration, Environment closure, Boolean isInitializer) {
+        this.isInitializer = isInitializer;
         this.declaration = declaration;
         this.closure = closure;
     }
@@ -21,7 +23,7 @@ class LoxFunction implements LoxCallable {
     LoxFunction bind(LoxInstance instance) {
         Environment environment = new Environment(closure);
         environment.define("this", instance);
-        return new LoxFunction(declaration, environment);
+        return new LoxFunction(declaration, environment, isInitializer);
     }
 
     /**
@@ -46,15 +48,14 @@ class LoxFunction implements LoxCallable {
     }
 
     /**
-     * Calls the function with the given arguments by creating a new environment
-     * that captures the current closure and defining each parameter in the new
-     * environment with the corresponding argument. It then executes the body of
-     * the function in the new environment and returns the result of the function
-     * call. If the function does not return a value, it returns null.
+     * Calls the function with the given arguments. If the function is an
+     * initializer and the call returns normally, it returns the value of
+     * the "this" variable. Otherwise, it returns the value returned by the
+     * function.
      *
-     * @param interpreter the interpreter to use
+     * @param interpreter the interpreter to use to execute the function
      * @param arguments   the arguments to pass to the function
-     * @return the result of the function call, or null if the function did not return a value
+     * @return the result of calling the function
      */
     @Override
     public Object call(Interpreter interpreter, List<Object> arguments) {
@@ -68,9 +69,12 @@ class LoxFunction implements LoxCallable {
         try {
             interpreter.executeBlock(declaration.body, environment);
         } catch (Return returnValue) {
+            if (isInitializer) return closure.getAt(0, "this");
+                        
             return returnValue.value;
         }
 
+        if (isInitializer) return closure.getAt(0, "this");
         return null;
     }
 }
