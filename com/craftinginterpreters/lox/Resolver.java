@@ -138,6 +138,21 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     }
 
     /**
+     * Visits a class statement, declaring the class name in the current
+     * scope and defining it, allowing the class to be referenced within
+     * its methods and elsewhere in the scope.
+     *
+     * @param stmt The class statement to visit.
+     * @return Always returns null.
+     */
+    @Override
+    public Void visitClassStmt(Stmt.Class stmt) {
+        declare(stmt.name);
+        define(stmt.name);
+        return null;
+    }
+
+    /**
      * Visits an expression statement, resolving the expression within
      * the current scope.
      *

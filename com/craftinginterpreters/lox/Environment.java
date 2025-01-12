@@ -39,6 +39,13 @@ class Environment {
         throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
     }
 
+    /**
+     * Defines a variable in the current environment by
+     * adding it to the map with the specified value.
+     *
+     * @param name The name of the variable to define.
+     * @param value The value to associate with the variable.
+     */
     void define(String name, Object value) {
         values.put(name, value);
     }

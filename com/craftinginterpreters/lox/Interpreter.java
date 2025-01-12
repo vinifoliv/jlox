@@ -206,8 +206,32 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
     }
 
+    /**
+     * Visits a block statement by creating a new environment scope
+     * for the block's statements and executing each statement within
+     * this new scope.
+     *
+     * @param stmt The block statement to visit.
+     * @return Always returns null.
+     */
+    @Override
     public Void visitBlockStmt(Stmt.Block stmt) {
         executeBlock(stmt.statements, new Environment(environment));
+        return null;
+    }
+
+    /**
+     * Visits a class statement, defining the class name in the current
+     * scope and binding it to an instance of LoxClass.
+     *
+     * @param stmt The class statement to visit.
+     * @return Always returns null.
+     */
+    @Override
+    public Void visitClassStmt(Stmt.Class stmt) {
+        environment.define(stmt.name.lexeme, null);
+        LoxClass klass = new LoxClass(stmt.name.lexeme);
+        environment.assign(stmt.name, klass);
         return null;
     }
 
